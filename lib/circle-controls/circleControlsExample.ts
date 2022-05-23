@@ -3,6 +3,8 @@ import { Application, ApplicationView, ScalableText } from '@daign/2d-graphics';
 import { SvgContext, SvgRenderer, RendererFactory } from '@daign/2d-graphics-svg';
 
 import { CircleWithRadiusControl } from './circleWithRadiusControl';
+import { CircleWithDiameterControl } from './circleWithDiameterControl';
+import { ThreePointCircleControl } from './threePointCircleControl';
 import { styleSheet } from './drawing.style';
 
 export class CircleControlsExample {
@@ -49,16 +51,20 @@ export class CircleControlsExample {
     this.application.drawingLayer.clearChildren();
 
     // Create the circle control objects and add them to the drawing layer.
-    const circle1 = new CircleWithRadiusControl( new Vector2( 10, 8 ), new Vector2( 10, 0 ) );
+    const circle1 = new CircleWithRadiusControl( new Vector2( -6, 0 ), new Vector2( -7, -2 ) );
     this.application.drawingLayer.appendChild( circle1 );
 
-    const circle2 = new CircleWithRadiusControl( new Vector2( 30, 8 ), new Vector2( 30, 0 ) );
+    const circle2 = new CircleWithDiameterControl( [ new Vector2( -1, -2 ), new Vector2( 1, 2 ) ] );
     this.application.drawingLayer.appendChild( circle2 );
+
+    const circle3 = new ThreePointCircleControl( [ new Vector2( 5, -2 ), new Vector2( 5, 2 ),
+      new Vector2( 8, -1 ) ] );
+    this.application.drawingLayer.appendChild( circle3 );
 
     // Add a text object.
     const text = new ScalableText();
-    text.anchor = new Vector2( 20, 20 );
-    text.fontSize = 2;
+    text.anchor = new Vector2( 0, 5 );
+    text.fontSize = 1;
     text.content = 'Click on a circle to show the controls.';
     text.textAnchor = 'middle';
     this.application.drawingLayer.appendChild( text );
