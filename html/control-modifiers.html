@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Modifiers - @daign/2d-graphics</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #ddd;
+    }
+
+    svg {
+      background: #fff;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+<script src="../bundle/app.js"></script>
+<script type="text/javascript">
+  new moduleBundle.ControlModifiersExample();
+</script>
+<ul>
+  <li><b>no modifier</b> - Every point can move freely.</li>
+  <li><b>follow along</b> - Following points move together with the moved point.</li>
+  <li><b>orthogonal (+follow along)</b> - Point must be orthogonal to previous point.</li>
+  <li><b>rounding/grid</b> - Points can only move to grid positions.</li>
+</ul>
+</body>
+</html>

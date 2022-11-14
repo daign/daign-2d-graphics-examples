@@ -12,6 +12,10 @@ http://daign.github.io/daign-2d-graphics-examples/html/basic-example.html
 http://daign.github.io/daign-2d-graphics-examples/html/circle-controls.html
 )** - Different ways to construct circles.
 
++ **[Control Modifiers](
+http://daign.github.io/daign-2d-graphics-examples/html/control-modifiers.html
+)** - Restrict or modify the movement of control points.
+
 ## Scripts
 
 ```bash
