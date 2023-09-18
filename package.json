@@ -35,11 +35,11 @@
     "uglify-js": "^3.4.9"
   },
   "dependencies": {
-    "@daign/2d-graphics": "^1.0.26",
-    "@daign/2d-graphics-svg": "^1.0.13",
-    "@daign/2d-pipeline": "^1.0.5",
-    "@daign/math": "^1.0.19",
-    "@daign/style-sheets": "^1.0.2"
+    "@daign/2d-graphics": "^1.1.7",
+    "@daign/2d-graphics-svg": "^1.1.5",
+    "@daign/2d-pipeline": "^1.1.1",
+    "@daign/math": "^1.1.1",
+    "@daign/style-sheets": "^1.1.1"
   },
   "nyc": {
     "include": [

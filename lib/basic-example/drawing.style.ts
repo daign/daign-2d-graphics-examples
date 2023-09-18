@@ -6,7 +6,7 @@ styleSheet.parseFromString(
   `.polyline {
     fill: none;
     stroke: #6699ff;
-    stroke-width: 10;
+    stroke-width: 0.5;
   }
   .control-layer {
     .controlPoint {

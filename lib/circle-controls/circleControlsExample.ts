@@ -33,12 +33,15 @@ export class CircleControlsExample {
     // Create the SVG renderer and set the style sheet.
     const rendererFactory = new RendererFactory();
     this.renderer = rendererFactory.createRenderer( styleSheet );
+    this.renderer.useNativeTransforms = true;
+    this.renderer.flattenGroups = true;
+    this.renderer.useInlineStyles = true;
 
     this.constructGraphic();
     this.drawGraphic();
 
-    // Redraw the graphic when there are changes in the drawing layer.
-    this.application.drawingLayer.redrawObservable.subscribeToChanges( (): void => {
+    // Subscribe to render signal.
+    this.application.updateManager.setRenderFunction( (): void => {
       this.drawGraphic();
     } );
   }
@@ -80,6 +83,6 @@ export class CircleControlsExample {
    * Render the view into the context node.
    */
   private drawGraphic(): void {
-    this.renderer.render( this.view, this.svgContext.wrappedNode );
+    this.renderer.render( this.view, this.svgContext.contentNode );
   }
 }

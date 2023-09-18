@@ -6,17 +6,17 @@ styleSheet.parseFromString(
   `.circle-with-radius {
     fill: #99ccff;
     stroke: #6699ff;
-    stroke-width: 5;
+    stroke-width: 0.2;
   }
   .circle-with-diameter {
     fill: #ff99cc;
     stroke: #ff6699;
-    stroke-width: 5;
+    stroke-width: 0.2;
   }
   .three-point-circle {
     fill: #ccff99;
     stroke: #99ff66;
-    stroke-width: 5;
+    stroke-width: 0.2;
   }
   .control-layer {
     .controlPoint {
