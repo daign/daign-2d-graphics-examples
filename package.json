@@ -35,11 +35,15 @@
     "uglify-js": "^3.4.9"
   },
   "dependencies": {
-    "@daign/2d-graphics": "^1.1.7",
-    "@daign/2d-graphics-svg": "^1.1.5",
-    "@daign/2d-pipeline": "^1.1.1",
-    "@daign/math": "^1.1.1",
-    "@daign/style-sheets": "^1.1.1"
+    "@daign/2d-graphics": "1.1.8",
+    "@daign/2d-graphics-svg": "1.1.6",
+    "@daign/2d-pipeline": "1.1.1",
+    "@daign/dom-pool": "1.1.0",
+    "@daign/handle": "1.1.0",
+    "@daign/math": "1.1.2",
+    "@daign/observable": "1.1.3",
+    "@daign/schedule": "1.1.0",
+    "@daign/style-sheets": "1.1.1"
   },
   "nyc": {
     "include": [

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wind Turbine Planner - @daign/2d-graphics</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    body {
+      margin: 0px;
+      background: #ddd;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    #header {
+      color: #fff;
+      background-color: #000;
+      height: 60px;
+    }
+    #title {
+      font-size: 15px;
+      padding: 4px 20px 2px 20px;
+    }
+    #layerSelector {
+      font-size: 20px;
+    }
+    #layerSelector div {
+      display: inline-block;
+      padding: 2px 10px 4px 10px;
+      margin: 0px 10px 0px 10px;
+      user-select: none;
+    }
+    #layerSelector div.button {
+      background-color: #333;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #layerSelector #layerTitle {
+      min-width: 200px;
+    }
+    #fileInput {
+      visibility: hidden;
+    }
+
+    svg {
+      background: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header">
+    <div id="title">
+      Wind Turbine Planner
+    </div>
+    <div id="layerSelector">
+      <div id="previousLayer" class="button">&lt;</div>
+      <div id="layerTitle"></div>
+      <div id="nextLayer" class="button">&gt;</div>
+    </div>
+    <input id="fileInput" type="file">
+  </div>
+  <div id="svg-container"></div>
+  <script src="../bundle/app.js"></script>
+  <script type="text/javascript">
+    new moduleBundle.WindTurbinePlanner();
+  </script>
+  <div id="imprint">
+    © <a href="http://daign.de">daign.de</a>
+    &nbsp;
+    <a href="https://github.com/daign/daign-2d-graphics-examples/blob/main/docs/imprint.md">Imprint</a>
+    &nbsp;
+    <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement">Privacy Policy</a>
+  </div>
+</body>
+</html>
