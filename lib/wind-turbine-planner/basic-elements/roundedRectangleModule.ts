@@ -3,7 +3,6 @@ import { PresentationNode } from '@daign/2d-pipeline';
 import { StyleSelectorChain } from '@daign/style-sheets';
 import { WrappedDomPool, WrappedNode } from '@daign/dom-pool';
 import { RenderModule } from '@daign/2d-graphics-svg';
-import { Handle } from '@daign/handle';
 
 import { RoundedRectangle } from './roundedRectangle';
 
@@ -31,18 +30,6 @@ export const roundedRectangleModule = new RenderModule(
     rectNode.setAttribute( 'height', String( size.y ) );
     rectNode.setAttribute( 'rx', String( rectangle.rx ) );
     rectNode.setAttribute( 'ry', String( rectangle.ry ) );
-
-    // Callback will be executed when node is clicked.
-    if ( rectangle.callback ) {
-      const handle = new Handle();
-      handle.setStartNode( rectNode );
-      handle.beginning = (): boolean => {
-        return true;
-      };
-      handle.clicked = (): void => {
-        rectangle.callback!();
-      };
-    }
 
     return rectNode;
   }

@@ -8,15 +8,19 @@ import { Tool } from '../types';
  * Polygon area control object with control points for each point of the polygon.
  */
 export class AreaControl extends ControlObject {
-  private currentTool: Tool = Tool.Edit;
-  private areaManager: AreaControlManager | null = null;
+  protected currentTool: Tool = Tool.Edit;
 
   public polygon: Polygon2 = new Polygon2();
 
+  private subscriptionRemover: () => void;
+
   /**
    * Constructor.
+   * @param areaManager - The object managing this area.
    */
-  public constructor() {
+  public constructor(
+    protected areaManager: AreaControlManager
+  ) {
     super();
 
     this.addClass( 'area' );
@@ -24,8 +28,9 @@ export class AreaControl extends ControlObject {
     this.updatePolygon();
 
     // Update the mathematical polygon object whenever the points of the area control change.
-    this.points.subscribeToChanges( (): void => {
+    this.subscriptionRemover = this.points.subscribeToChanges( (): void => {
       this.updatePolygon();
+      this.areaManager.sendChangeNotification();
     } );
   }
 
@@ -36,14 +41,6 @@ export class AreaControl extends ControlObject {
   public setTool( tool: Tool ): void {
     this.currentTool = tool;
     this.redraw();
-  }
-
-  /**
-   * Set the manager which is managing this area.
-   * @param manager - The manager to set.
-   */
-  public setManager( manager: AreaControlManager ): void {
-    this.areaManager = manager;
   }
 
   /**
@@ -61,21 +58,28 @@ export class AreaControl extends ControlObject {
 
     // Display a delete button.
     if ( this.currentTool === Tool.Delete ) {
-      // Callback function.
-      const deletionCallback = (): void => {
-        if ( this.areaManager ) {
-          this.areaManager.removeArea( this );
-        }
-      };
-
-      const buttonShape = new UseElement();
-      buttonShape.href = '#deleteButton';
-
-      const button = new ButtonObject( deletionCallback );
-      button.buttonShape = buttonShape;
-      button.anchor.copy( this.polygon.getBoxCenter() );
-      this.buttons.push( button );
+      this.addDeleteButton();
     }
+  }
+
+  /**
+   * Add a delete button.
+   */
+  protected addDeleteButton(): void {
+    // Callback function.
+    const deletionCallback = (): void => {
+      if ( this.areaManager ) {
+        this.areaManager.removeArea( this );
+      }
+    };
+
+    const buttonShape = new UseElement();
+    buttonShape.href = '#deleteButton';
+
+    const button = new ButtonObject( deletionCallback );
+    button.buttonShape = buttonShape;
+    button.anchor.copy( this.polygon.getBoxCenter() );
+    this.buttons.push( button );
   }
 
   /**
@@ -83,5 +87,12 @@ export class AreaControl extends ControlObject {
    */
   private updatePolygon(): void {
     this.polygon.elements = this.points.elements
+  }
+
+  /**
+   * Remove subscriptions from this object.
+   */
+  public removeSubscriptions(): void {
+    this.subscriptionRemover();
   }
 }

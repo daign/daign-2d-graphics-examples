@@ -2,7 +2,7 @@ import { Handle } from '@daign/handle';
 import { Application } from '@daign/2d-graphics';
 import { Vector2 } from '@daign/math';
 
-import { AreaControl, AreaControlManager } from '../controls';
+import { AreaControl, AreaFactory } from '../controls';
 
 // Minimum distance before a drag is recognised.
 const minimumDragDistance = 5;
@@ -39,10 +39,10 @@ export class DrawAreaHandle {
    * Create the Handle used for drawing areas.
    * @param domNode - The domNode to register the handle to.
    * @param application - The corresponding application object.
-   * @param controlManager - The area control manager to add new areas to.
+   * @param areaFactory - The factory to create new areas.
    * @returns The handle.
    */
-  public constructor( domNode: any, application: Application, controlManger: AreaControlManager ) {
+  public constructor( domNode: any, application: Application, areaFactory: AreaFactory ) {
     // The currently selected area.
     let activeArea: AreaControl | null = null;
 
@@ -66,9 +66,7 @@ export class DrawAreaHandle {
       if ( activeObject && activeObject instanceof AreaControl ) {
         activeArea = activeObject;
       } else {
-        const newArea = new AreaControl();
-        controlManger.addArea( newArea );
-        activeArea = newArea;
+        activeArea = areaFactory.createArea();
       }
 
       // Get the coordinates of the point where the mouse points to.

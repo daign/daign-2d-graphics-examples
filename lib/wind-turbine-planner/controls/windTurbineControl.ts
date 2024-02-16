@@ -1,7 +1,10 @@
 import { Vector2 } from '@daign/math';
-import { Application, ButtonObject, ControlObject, UseElement } from '@daign/2d-graphics';
+import { Application, ButtonObject, ControlObject, Group, TwoPointCircle,
+  UseElement } from '@daign/2d-graphics';
 
 import { Tool } from '../types';
+
+const deforestationRadius = 50;
 
 /**
  * Collection of points for each wind turbine position.
@@ -41,6 +44,24 @@ export class WindTurbineControl extends ControlObject {
       useElement.href = '#turbineGraphic';
       useElement.anchor = point.clone();
       this.appendChild( useElement );
+    } );
+
+    // Create a reusable element with circles of deforestation radius around each turbine.
+    // The outer group is hidden because the element should not appear unless in use elements.
+    const deforestationTemplate = new Group();
+    deforestationTemplate.addClass( 'deforestationTemplate' );
+    this.appendChild( deforestationTemplate );
+
+    // The inner group that can be referenced and contains the circles.
+    const deforestationArea = new Group();
+    deforestationArea.id = 'deforestationArea';
+    deforestationArea.addClass( 'deforestationArea' );
+    deforestationTemplate.appendChild( deforestationArea );
+    this.points.elements.forEach( ( point: Vector2 ): void => {
+      const circle = new TwoPointCircle();
+      circle.center.copy( point );
+      circle.circlePoint.copy( point ).add( new Vector2( deforestationRadius, 0 ) );
+      deforestationArea.appendChild( circle );
     } );
 
     // Display a delete button for each turbine.

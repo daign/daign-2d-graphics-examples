@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control Modifiers - @daign/2d-graphics</title>
-  <link rel="stylesheet" href="common.css">
+  <title>Basic Example - @daign/2d-graphics</title>
+  <link rel="stylesheet" href="../common/common.css">
   <style>
     body {
       font-family: sans-serif;
@@ -19,18 +19,12 @@
 </head>
 
 <body>
-<script src="../bundle/app.js"></script>
+<script src="../../bundle/app.js"></script>
 <script type="text/javascript">
-  new moduleBundle.ControlModifiersExample();
+  new moduleBundle.BasicExample();
 </script>
-<ul>
-  <li><b>no modifier</b> - Every point can move freely.</li>
-  <li><b>follow along</b> - Following points move together with the moved point.</li>
-  <li><b>orthogonal (+follow along)</b> - Point must be orthogonal to previous point.</li>
-  <li><b>rounding/grid</b> - Points can only move to grid positions.</li>
-</ul>
 <div id="imprint">
-  © <a href="http://daign.de">daign.de</a>
+  <a href="http://daign.de">daign.de</a>
   &nbsp;
   <a href="https://github.com/daign/daign-2d-graphics-examples/blob/main/docs/imprint.md">Imprint</a>
   &nbsp;

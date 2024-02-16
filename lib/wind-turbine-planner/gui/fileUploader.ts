@@ -30,6 +30,7 @@ export class FileUploader {
           const imageDataUri = ( e.target as FileReader ).result as string;
           this.backgroundImageObject.imageData = imageDataUri;
 
+          this.application.selectionManager.setSelection( this.backgroundImageObject, null );
           this.application.redraw();
         };
 

@@ -1,12 +1,12 @@
 import { Group } from '@daign/2d-graphics';
 
-import { ToolButton } from './toolButton';
+import { MenuButton } from './menuButton';
 
 /**
- * Class for the tool bar.
+ * Class for the layer menu.
  */
-export class ToolBar extends Group {
-  private buttons: ToolButton[] = [];
+export class LayerMenu extends Group {
+  private buttons: MenuButton[] = [];
 
   /**
    * Constructor.
@@ -15,16 +15,16 @@ export class ToolBar extends Group {
     super();
 
     // Style Sheet selector.
-    this.addClass( 'tool-bar' );
+    this.addClass( 'layer-menu' );
 
     this.redraw();
   }
 
   /**
-   * Draw button.
-   * @param buttons - Array of tool buttons.
+   * Set array of buttons and redraw.
+   * @param buttons - Array of menu buttons.
    */
-  public drawButtons( buttons: ToolButton[] ): void {
+  public drawButtons( buttons: MenuButton[] ): void {
     this.buttons = buttons;
     this.redraw();
   }
@@ -35,8 +35,8 @@ export class ToolBar extends Group {
   public redraw(): void {
     this.clearChildren();
 
-    this.buttons.forEach( ( button: ToolButton, index: number ): void => {
-      button.position.set( 10, 10 + 45 * index );
+    this.buttons.forEach( ( button: MenuButton, index: number ): void => {
+      button.position.set( 10, 10 + 65 * index );
       button.redraw();
       this.appendChild( button );
     } );

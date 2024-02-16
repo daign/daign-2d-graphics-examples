@@ -5,16 +5,22 @@
 ### Basic examples
 
 + **[Basic Example](
-http://daign.github.io/daign-2d-graphics-examples/html/basic-example.html
+http://daign.github.io/daign-2d-graphics-examples/html/basic-example/
 )** - Change the points of a line.
 
 + **[Circle Controls](
-http://daign.github.io/daign-2d-graphics-examples/html/circle-controls.html
+http://daign.github.io/daign-2d-graphics-examples/html/circle-controls/
 )** - Different ways to construct circles.
 
 + **[Control Modifiers](
-http://daign.github.io/daign-2d-graphics-examples/html/control-modifiers.html
+http://daign.github.io/daign-2d-graphics-examples/html/control-modifiers/
 )** - Restrict or modify the movement of control points.
+
+### Advanced examples
+
++ **[Wind Turbine Planner](
+http://daign.github.io/daign-2d-graphics-examples/html/wind-turbine-planner/
+)** - Interactive wind turbine placement.
 
 ## Scripts
 

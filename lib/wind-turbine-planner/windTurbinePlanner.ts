@@ -1,39 +1,44 @@
 import { Vector2 } from '@daign/math';
-import { Application, ApplicationView, Group, InteractiveViewport } from '@daign/2d-graphics';
+import { Application, ApplicationView, GraphicStyle, Group,
+  InteractiveViewport } from '@daign/2d-graphics';
 import { RendererFactory, SvgContext, SvgRenderer } from '@daign/2d-graphics-svg';
 import { Schedule } from '@daign/schedule';
+import { StyleSheet } from '@daign/style-sheets';
 
-import { AreaControlManager, BackgroundImage, DistanceAlert, WindTurbineControl } from './controls';
-import { styleSheet } from './drawing.style';
+import { AreaControlManager, AreaFactory, BackgroundImage, DeforestationEstimate, DistanceAlert,
+  WindTurbineControl } from './controls';
 import { Layer, Tool } from './types';
 import { DrawAreaHandle, DrawTurbineHandle } from './handles';
 import { roundedRectangleModule } from './basic-elements';
-import { FileUploader, LayerManager, loadIcons, ToolBar, ToolManager } from './gui';
+import { FileUploader, LayerMenu, ScaleBar, ToolMenu } from './gui';
+import { LayerManager, ToolManager } from './managers';
 
 export class WindTurbinePlanner {
   // Drawing application objects.
   private svgContext: SvgContext;
   public application: Application;
   private view: ApplicationView;
-  private renderer: SvgRenderer;
+  private renderer: SvgRenderer | null = null;
 
   // User interface managers.
   public layerManager: LayerManager;
+  private layerMenu: LayerMenu;
   public toolManager: ToolManager;
-  private toolBar: ToolBar;
+  private toolMenu: ToolMenu;
   public fileUploader: FileUploader;
 
+  public scaleBar: ScaleBar;
+
   // Content elements.
-  private backgroundImage: BackgroundImage = new BackgroundImage(
-    [ new Vector2(), new Vector2( 0, -100 ) ]
-  );
+  private backgroundImage: BackgroundImage;
   private cityAreaManager: AreaControlManager;
   private woodAreaManager: AreaControlManager;
   private turbines: WindTurbineControl;
   private distanceAlert: DistanceAlert = new DistanceAlert();
+  private deforestationEstimate: DeforestationEstimate = new DeforestationEstimate();
 
   // Content layers.
-  private layers: any = {
+  private layers: { [ key in Layer ]: Group } = {
     [ Layer.BackgroundImage ]: new Group(),
     [ Layer.CityArea ]: new Group(),
     [ Layer.WoodArea ]: new Group(),
@@ -49,21 +54,6 @@ export class WindTurbinePlanner {
    * The constructor.
    */
   public constructor() {
-    // Layer manager.
-    this.layerManager = new LayerManager();
-    this.layerManager.subscribeToChanges( (): void => {
-      this.setLayer();
-      this.toolManager.setLayer( this.layerManager.currentLayer );
-    } );
-
-    // Tool manager and tool bar.
-    this.toolBar = new ToolBar();
-    this.toolManager = new ToolManager( this, this.toolBar );
-    this.toolManager.subscribeToChanges( (): void => {
-      this.setTool();
-      this.application.redraw();
-    } );
-
     // Create the SVG context, set the size and append it to the container element.
     this.svgContext = new SvgContext();
     this.calculateContextSize();
@@ -71,55 +61,89 @@ export class WindTurbinePlanner {
     if ( svgContainer ) {
       svgContainer.appendChild( this.svgContext.domNode );
     }
-    loadIcons( this.svgContext.defsNode );
 
     // Create the application.
     // This is just a group containing the drawing layer and the layer for control points.
     // Set second parameter true for an interactive application with panning and zooming.
     this.application = new Application( this.svgContext, true );
 
-    // File Uploader.
-    this.fileUploader = new FileUploader( this.application, 'fileInput', this.backgroundImage );
-
     // Create the view.
     this.view = new ApplicationView( this.application );
 
-    // Create the SVG renderer and set the style sheet.
-    const rendererFactory = new RendererFactory();
-    this.renderer = rendererFactory.createRenderer( styleSheet );
-    this.renderer.addRenderModule( roundedRectangleModule );
-    this.renderer.useNativeTransforms = true;
-    this.renderer.flattenGroups = false;
-    this.renderer.useInlineStyles = true;
+    // Layer manager and layer menu.
+    this.layerMenu = new LayerMenu();
+    this.layerManager = new LayerManager( this, this.layerMenu );
+    this.layerManager.subscribeToChanges( (): void => {
+      this.setLayer();
+      this.toolManager.setLayer( this.layerManager.currentLayer );
+    } );
 
-    // Add tool bar to application.
-    this.application.appendChild( this.toolBar );
+    // Tool manager and tool menu.
+    this.toolMenu = new ToolMenu();
+    this.toolManager = new ToolManager( this, this.toolMenu );
+    this.toolManager.subscribeToChanges( (): void => {
+      this.setTool();
+      this.application.redraw();
+    } );
+
+    // Scale bar.
+    this.scaleBar = new ScaleBar( this.svgContext, this.application.drawingLayer );
+    this.application.updateManager.subscribeToRedrawEvent( (): void => {
+      this.scaleBar.redraw();
+    } );
+
+    // Add menu and scale bar to application.
+    this.application.appendChild( this.layerMenu );
+    this.application.appendChild( this.toolMenu );
+    this.application.appendChild( this.scaleBar );
     this.toolManager.setLayer( this.layerManager.currentLayer );
 
     // Create the graphic elements.
+    this.backgroundImage = new BackgroundImage( this.application, [
+      // Center and extension point.
+      new Vector2( 0, 0 ), new Vector2( 0, -1500 ),
+      // Points for matching the scale.
+      new Vector2( -500, 500 ), new Vector2( 500, 500 )
+    ] );
+
     this.turbines = new WindTurbineControl( this.application );
-    this.turbines.points.subscribeToChanges( (): void => {
-      const restrictedAreas = this.cityAreaManager.areas;
-      this.distanceAlert.redraw( this.turbines, restrictedAreas );
-    } );
-    this.cityAreaManager = new AreaControlManager( this.application )
+    this.cityAreaManager = new AreaControlManager( this.application );
     this.cityAreaManager.setLayer( this.layers[ Layer.CityArea ] );
-    this.woodAreaManager = new AreaControlManager( this.application )
+    this.woodAreaManager = new AreaControlManager( this.application );
     this.woodAreaManager.setLayer( this.layers[ Layer.WoodArea ] );
+    // Subscriptions on graphic elements.
+    this.turbines.points.subscribeToChanges( (): void => {
+      const cityAreas = this.cityAreaManager.areas;
+      const woodAreas = this.woodAreaManager.areas;
+      this.distanceAlert.redraw( this.turbines, cityAreas );
+      this.deforestationEstimate.redraw( this.turbines, woodAreas );
+    } );
+    this.cityAreaManager.subscribeToChanges( (): void => {
+      const cityAreas = this.cityAreaManager.areas;
+      this.distanceAlert.redraw( this.turbines, cityAreas );
+    } );
+    this.woodAreaManager.subscribeToChanges( (): void => {
+      const woodAreas = this.woodAreaManager.areas;
+      this.deforestationEstimate.redraw( this.turbines, woodAreas );
+    } );
+
+    const cityAreaFactory = new AreaFactory( false, this.cityAreaManager );
+    const woodAreaFactory = new AreaFactory( true, this.woodAreaManager );
 
     this.constructGraphic();
 
+    // File Uploader.
+    this.fileUploader = new FileUploader( this.application, 'fileInput', this.backgroundImage );
+
     // Setup the drawing handles.
     this.drawCityHandle = new DrawAreaHandle( this.svgContext.domNode, this.application,
-      this.cityAreaManager );
+      cityAreaFactory );
     this.drawWoodHandle = new DrawAreaHandle( this.svgContext.domNode, this.application,
-      this.woodAreaManager );
+      woodAreaFactory );
     this.drawTurbineHandle = new DrawTurbineHandle( this.svgContext.domNode, this.application,
       this.turbines );
 
-    // Initial rendering.
     this.setLayer();
-    this.drawGraphic();
 
     // The function to execute when the window is being resized.
     const resizeCallback = (): void => {
@@ -140,6 +164,82 @@ export class WindTurbinePlanner {
     this.application.updateManager.setRenderFunction( (): void => {
       this.drawGraphic();
     } );
+
+    Promise.all( [
+      // Load style sheet.
+      this.loadStyleSheet()
+        .then( ( styleSheet: StyleSheet<GraphicStyle> ): void => {
+          // Create the SVG renderer and set the style sheet.
+          const rendererFactory = new RendererFactory();
+          this.renderer = rendererFactory.createRenderer( styleSheet );
+          this.renderer.addRenderModule( roundedRectangleModule );
+          this.renderer.useNativeTransforms = true;
+          this.renderer.flattenGroups = false;
+          this.renderer.useInlineStyles = true;
+        } ),
+      // Load icons.
+      this.loadSvgFile( './assets/icons.svg' )
+        .then( ( svgContent: string ): void => {
+          // Attach icons to defs section of SVG context.
+          this.svgContext.defsNode.domNode.innerHTML += svgContent;
+        } ),
+      // Load example map.
+      this.loadSvgFile( './assets/map.svg' )
+        .then( ( svgContent: string ): void => {
+          // Attach map to defs section of SVG context.
+          this.svgContext.defsNode.domNode.innerHTML += svgContent;
+        } )
+    ] )
+      .then( (): void => {
+        // Initial render.
+        this.drawGraphic();
+      } );
+  }
+
+  /**
+   * Load style sheet.
+   * @returns Promise containing the style sheet.
+   */
+  private loadStyleSheet(): Promise<StyleSheet<GraphicStyle>> {
+    return fetch( './graphicStyle.scss' )
+      .then( ( response: Response ): Promise<StyleSheet<GraphicStyle>> => {
+        if ( !response.ok ) {
+          throw new Error( 'Failed to load the graphics style.' );
+        }
+
+        return response.text()
+          .then( ( content: string ): StyleSheet<GraphicStyle> => {
+            const styleSheet = new StyleSheet<GraphicStyle>();
+            styleSheet.parseFromString( content, GraphicStyle );
+            return styleSheet;
+        } );
+      } );
+  }
+
+  /**
+   * Load SVG file.
+   * @param filePath - The path of the file.
+   * @returns Promise containing the inner HTML string.
+   */
+  private loadSvgFile( filePath: string ): Promise<string> {
+    return fetch( filePath )
+      .then( ( response: Response ): Promise<string> => {
+        if ( !response.ok ) {
+          throw new Error( 'Failed to load SVG file.' );
+        }
+
+        return response.text()
+          .then( ( content: string ): string => {
+            // Parse loaded file to DOM.
+            const parser = new DOMParser();
+            const svg = parser.parseFromString( content, 'image/svg+xml' ).documentElement;
+
+            if ( !svg.firstElementChild ) {
+              throw new Error( 'SVG file is empty.' );
+            }
+            return svg.firstElementChild.innerHTML;
+          } );
+      } );
   }
 
   /**
@@ -161,6 +261,8 @@ export class WindTurbinePlanner {
     this.layers[ Layer.Turbines ].addClass( 'turbine-layer' );
     this.application.drawingLayer.appendChild( this.layers[ Layer.Turbines ] );
 
+    this.application.drawingLayer.appendChild( this.deforestationEstimate );
+
     this.application.drawingLayer.appendChild( this.distanceAlert );
 
     // Attach the single preset background image element.
@@ -169,9 +271,16 @@ export class WindTurbinePlanner {
     // Attach the single preset wind turbine control.
     this.layers[ Layer.Turbines ].appendChild( this.turbines );
 
-    ( this.application.drawingLayer as any ).viewScale = 5;
-    ( this.application.drawingLayer as any ).viewCenter.set( 0, 0 );
-    ( this.application.drawingLayer as any ).updateViewport();
+    // Set initial view scale, center and limits.
+    this.application.drawingLayer.viewScale.x = 0.4;
+    this.application.drawingLayer.viewCenter.set( 0, 0 );
+    this.application.drawingLayer.scaleMin = 0.01;
+    this.application.drawingLayer.scaleMax = 100;
+    const viewLimit = Math.pow( 10, 6 );
+    const viewCenterLimit = this.application.drawingLayer.viewCenterLimit;
+    viewCenterLimit.makeEmpty();
+    viewCenterLimit.expandByPoint( new Vector2( -viewLimit, -viewLimit ) );
+    viewCenterLimit.expandByPoint( new Vector2( viewLimit, viewLimit ) );
 
     // Define which part of the document we want to view. In this case the whole application.
     this.view.mountNode( this.application );
@@ -225,7 +334,11 @@ export class WindTurbinePlanner {
     const currentTool = this.toolManager.currentTool;
 
     // Different actions to take depending on active layer.
-    if ( currentLayer === Layer.CityArea ) {
+    if ( currentLayer === Layer.BackgroundImage ) {
+      if ( this.backgroundImage ) {
+        this.backgroundImage.setTool( currentTool );
+      }
+    } else if ( currentLayer === Layer.CityArea ) {
       this.cityAreaManager.setTool( currentTool );
 
       // For the drawing tool, viewport actions have to be disabled.
@@ -253,9 +366,21 @@ export class WindTurbinePlanner {
   }
 
   /**
+   * Set the example map to the background image.
+   */
+  public setExampleMap(): void {
+    this.backgroundImage.useReference = '#exampleMap';
+
+    this.application.selectionManager.setSelection( this.backgroundImage, null );
+    this.application.redraw();
+  }
+
+  /**
    * Render the view into the context node.
    */
   private drawGraphic(): void {
-    this.renderer.render( this.view, this.svgContext.contentNode );
+    if ( this.renderer ) {
+      this.renderer.render( this.view, this.svgContext.contentNode );
+    }
   }
 }

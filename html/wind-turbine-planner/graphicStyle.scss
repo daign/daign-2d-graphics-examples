@@ -1,0 +1,201 @@
+// Style sheet that will be parsed with @daign/style-sheets.
+.layer-menu {
+  .menu-button {
+    .rectangle {
+      fill: #000;
+      cursor: pointer;
+    }
+    .rectangle.active {
+      fill: #0a0;
+    }
+    .rectangle.inactive {
+      fill: #000;
+    }
+    .use {
+      fill: #fff;
+      pointer-events: none;
+    }
+  }
+}
+.tool-menu {
+  .menu-button {
+    .rectangle {
+      fill: #0ac;
+      cursor: pointer;
+    }
+    .rectangle.active {
+      fill: #0a0;
+    }
+    .rectangle.inactive {
+      fill: #000;
+    }
+    .use {
+      fill: #fff;
+      pointer-events: none;
+    }
+  }
+}
+
+.scale-bar {
+  .polyline {
+    fill: none;
+    stroke: #000;
+    stroke-width: 2;
+  }
+  .line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1.5;
+  }
+  .text {
+    font-size: 12px;
+  }
+}
+
+.background-image-layer {
+  .background-image {
+    .rectangle {
+      fill: none;
+      stroke: #999;
+      stroke-width: 0.005;
+    }
+  }
+}
+.background-image-layer.inactive {
+  pointer-events: none;
+}
+
+.city-layer {
+  .area {
+    .polygon {
+      fill: url(#cityPattern);
+      fill-opacity: 0.4;
+      stroke: #C840A8;
+      stroke-width: 5;
+    }
+  }
+}
+.city-layer.inactive {
+  pointer-events: none;
+}
+
+.wood-layer {
+  .woodMask {
+    .polygon {
+      fill: #fff;
+      stroke: #fff;
+      stroke-width: 5;
+    }
+    .woodMaskCutout {
+      fill: #000;
+    }
+  }
+
+  .woodArea {
+    fill: url(#woodPattern);
+    fill-opacity: 0.5;
+    stroke: #35B934;
+    stroke-width: 5;
+  }
+
+  .deforestationMask {
+    fill: #fff;
+    stroke: #fff;
+    stroke-width: 5;
+  }
+
+  .deforestationArea {
+    fill: url(#deforestationPattern);
+    opacity: 0.3;
+  }
+
+  .deforestationBorderMask {
+    .borderMaskPositive {
+      fill: #fff;
+      stroke: #fff;
+      // Double the width of the other shapes, because it is overlaid by the fill.
+      stroke-width: 10;
+    }
+    .borderMaskNegative {
+      fill: #000;
+    }
+  }
+
+  .deforestationBorder {
+    fill: #A52A2A;
+  }
+
+  .dashedBorder {
+    fill: none;
+    stroke: #35B934;
+    stroke-width: 4.5;
+    stroke-dasharray: 20 20;
+  }
+}
+.wood-layer.inactive {
+  pointer-events: none;
+}
+
+.turbine-layer {
+  .deforestationTemplate {
+    display: none;
+
+    .deforestationArea {
+      display: inline;
+    }
+  }
+}
+.turbine-layer.inactive {
+  pointer-events: none;
+}
+
+.distance-alert {
+  .line {
+    stroke: #ff0000;
+    stroke-width: 5;
+    pointer-events: none;
+  }
+  .circle {
+    fill: url(#warnPattern);
+    stroke: #ff0000;
+    stroke-width: 2;
+    fill-opacity: 0.3;
+    stroke-opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.deforestation-estimate {
+  .rectangle {
+    fill: #000;
+  }
+  .scalableText {
+    fill: #fff;
+  }
+}
+
+.control-layer {
+  .controlPoint {
+    fill: #ff0000;
+
+    .scale-pin {
+      fill: #fff;
+      fill-opacity: 0;
+      stroke: #000;
+      stroke-width: 3;
+    }
+  }
+  .scale-distance {
+    .line {
+      fill: none;
+      stroke: #000;
+      stroke-width: 3;
+    }
+    .rectangle {
+      fill: #000;
+    }
+    .scalableText {
+      fill: #fff;
+    }
+  }
+}

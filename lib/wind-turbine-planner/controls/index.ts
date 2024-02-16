@@ -1,5 +1,10 @@
 export { AreaControl } from './areaControl';
 export { AreaControlManager } from './areaControlManager';
+export { AreaControlWood } from './areaControlWood';
+export { AreaFactory } from './areaFactory';
 export { BackgroundImage } from './backgroundImage';
+export { BackgroundImageGuide } from './backgroundImageGuide';
+export { BackgroundImageModifier } from './backgroundImageModifier';
+export { DeforestationEstimate } from './deforestationEstimate';
 export { DistanceAlert } from './distanceAlert';
 export { WindTurbineControl } from './windTurbineControl';

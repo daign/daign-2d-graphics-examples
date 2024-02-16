@@ -1,3 +1,4 @@
+import { Observable } from '@daign/observable';
 import { Application, Group } from '@daign/2d-graphics';
 
 import { AreaControl } from './areaControl';
@@ -6,7 +7,7 @@ import { Tool } from '../types';
 /**
  * Manager for area control objects.
  */
-export class AreaControlManager {
+export class AreaControlManager extends Observable {
   public areas: AreaControl[] = [];
   private layer: Group | null = null;
 
@@ -14,7 +15,9 @@ export class AreaControlManager {
    * Constructor.
    * @param application - The corresponding application.
    */
-  public constructor( private application: Application ) {}
+  public constructor( private application: Application ) {
+    super();
+  }
 
   /**
    * Set the group object that is the layer containing the areas in the graphic.
@@ -34,7 +37,7 @@ export class AreaControlManager {
       this.layer.appendChild( area );
     }
 
-    area.setManager( this );
+    this.notifyObservers();
   }
 
   /**
@@ -42,6 +45,8 @@ export class AreaControlManager {
    * @param area - The area control to remove.
    */
   public removeArea( area: AreaControl ): void {
+    area.removeSubscriptions();
+
     const index = this.areas.indexOf( area );
     if ( index !== -1 ) {
       this.areas.splice( index, 1 );
@@ -50,6 +55,7 @@ export class AreaControlManager {
       this.layer.removeChild( area );
     }
 
+    this.notifyObservers();
     this.application.selectionManager.setSelection( null, null );
     this.application.redraw();
   }
@@ -62,5 +68,12 @@ export class AreaControlManager {
     this.areas.forEach( ( area: AreaControl ): void => {
       area.setTool( tool );
     } );
+  }
+
+  /**
+   * Send a change notification to all subscribers of this object.
+   */
+  public sendChangeNotification(): void {
+    this.notifyObservers();
   }
 }
